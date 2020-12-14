@@ -220,7 +220,7 @@ class NodeDetails(qt.QWidget):
         detailsText = """<table cellpadding="2">
 <tr>"""
         value = ''
-        for key, value in detailsDict.iteritems():
+        for key, value in detailsDict.items():
             if key in storedMetadata:
                 if key in Xnat.metadata.DEFAULT_DATE_TAGS:
                     #print value

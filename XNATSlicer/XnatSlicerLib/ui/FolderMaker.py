@@ -57,7 +57,7 @@ class FolderMaker(qt.QWidget):
         self.Events = MokaUtils.Events(self.EVENT_TYPES)
         self.__xsiList = qt.QComboBox()
         self.__xsiList.addItems([key for key, value in \
-                               Xnat.xsi.DEFAULT_TYPES.iteritems()])
+                               Xnat.xsi.DEFAULT_TYPES.items()])
         self.__levelLabels = {}
         self.__lineEdits = {}
         self.__errorLines = {}
@@ -81,7 +81,7 @@ class FolderMaker(qt.QWidget):
         Inherits from qt.QWidget.   Conducts some custom routines as well.
         """
         try:
-            for key, widget in self.__lineEdits.iteritems():
+            for key, widget in self.__lineEdits.items():
                 widget.clear()
         except:
             pass
@@ -99,7 +99,7 @@ class FolderMaker(qt.QWidget):
         #--------------------
         # Enable line edits
         #--------------------
-        for level, item in self.__lineEdits.iteritems():
+        for level, item in self.__lineEdits.items():
             item.setEnabled(True)
 
 
@@ -124,7 +124,7 @@ class FolderMaker(qt.QWidget):
         @param event: The QT event.
         @type event: number     
         """
-        for level, lineEdit in self.__lineEdits.iteritems():
+        for level, lineEdit in self.__lineEdits.items():
             # click or key release
             if (event.type() == 3 or event.type() == 7) and widget == lineEdit:
                 #print "CLICK!"
@@ -150,7 +150,7 @@ class FolderMaker(qt.QWidget):
             selectedXnatLevel = self.View.getItemLevel()
             if not selectedXnatLevel in self.xnatLevels:
                 selectedXnatLevel = self.xnatLevels[-1]
-        except Exception, e:
+        except Exception as e:
             selectedXnatLevel = 'projects'   
         return selectedXnatLevel
 
@@ -187,7 +187,7 @@ class FolderMaker(qt.QWidget):
         Clears the error lines.
         """
         #MokaUtils.debug.lf()
-        for key, errorLine in self.__errorLines.iteritems():
+        for key, errorLine in self.__errorLines.items():
             errorLine.setText('')
 
 

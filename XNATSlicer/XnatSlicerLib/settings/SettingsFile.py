@@ -160,7 +160,7 @@ class SettingsFile:
     for name in self.defaultHosts:
          default = True if name == 'Central' else False
          modifiable = True if name != 'Central' else False
-         #print modifiable, name
+         #print(modifiable + name)
          self.saveHost(name, self.defaultHosts[name], 
                        isModifiable = modifiable, isDefault = default)    
 
@@ -200,7 +200,7 @@ class SettingsFile:
       # For dictionary arguments
       #--------------------
       if isinstance(args[0], dict):
-        for tag, items in args[0].iteritems(): 
+        for tag, items in args[0].items(): 
           # Convert items to list, if necessary
           items = items if isinstance(items, list) else [items]
           if len(items) > 0:
@@ -236,10 +236,10 @@ class SettingsFile:
       with open(self.filepath) as f:
         content = f.readlines()
         for l in content:
-          print l
+          print(l)
         del content
     else:
-      print "No settings file at: %s"%(self.filepath)
+      print("No settings file at: %s"%(self.filepath))
 
 
       

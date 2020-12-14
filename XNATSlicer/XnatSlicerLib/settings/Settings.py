@@ -123,7 +123,7 @@ class Settings(qt.QScrollArea):
         @param xnatHost: The XNAT hosts to set.
         @type xnatHost: str
         """
-        if not isinstance(currXnatHost, basestring):
+        if not isinstance(currXnatHost, str):
             raise Exception('\'xnatHost\' argument must be a string.')
         self.__currXnatHost = currXnatHost
 
@@ -255,7 +255,7 @@ class Settings(qt.QScrollArea):
         if hasattr(self, 'DEFAULTS'):
             self.applyDefaultsIfNeeded()
 
-        for syncType, methods in self.syncCallbacks_ToFile.iteritems():
+        for syncType, methods in self.syncCallbacks_ToFile.items():
             for method in methods:
                 method()
 
@@ -313,12 +313,12 @@ class Settings(qt.QScrollArea):
         """
             
         #MokaUtils.debug.lf('Apply defaults!\n\n')
-        for key, keyValue in self.DEFAULTS.iteritems():
+        for key, keyValue in self.DEFAULTS.items():
             #MokaUtils.debug.lf(key, keyValue)
             if not isinstance(keyValue, dict):
                 self.writeSettingIfEmpty(key, keyValue)
             else:
-                for subKey, subKeyValue in keyValue.iteritems():
+                for subKey, subKeyValue in keyValue.items():
                     self.writeSettingIfEmpty(subKey, subKeyValue)
                 
  

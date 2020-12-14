@@ -156,7 +156,7 @@ class FontSetting(object):
         """
         Syncs the SettingsFile to the current value on the dropdown.
         """
-        for key, dropdownList in self.fontDropdowns.iteritems():
+        for key, dropdownList in self.fontDropdowns.items():
             for dropdown in dropdownList:
                 fontSize = self.SettingsFile.setSetting(self.currXnatHost, 
                                            {key : dropdown.currentText})
@@ -167,7 +167,7 @@ class FontSetting(object):
         """
         Syncs the dropdown to stored value in the SettingsFile.
         """
-        for key, dropdownList in self.fontDropdowns.iteritems():
+        for key, dropdownList in self.fontDropdowns.items():
             fontSize = self.SettingsFile.getSetting(self.currXnatHost, 
                                                     key)
             for dropdown in dropdownList:

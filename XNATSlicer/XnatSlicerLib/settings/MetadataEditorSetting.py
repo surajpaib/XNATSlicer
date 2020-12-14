@@ -107,7 +107,7 @@ class MetadataEditorSetting(object):
         """
         Closes all of the collabsible frames of the editor.
         """
-        for key, _set in self.MetadataEditorSets.iteritems():
+        for key, _set in self.MetadataEditorSets.items():
             if _set.collapsibles:
                 for key in _set.collapsibles:
                     _set.collapsibles[key].show() 
@@ -231,7 +231,7 @@ class MetadataEditorSetting(object):
         section = MokaUtils.string.toCamelCase(section)
         if hasattr(self, 'DEFAULT_METADATA'):
             self.DEFAULTS[section] = {}
-            for level, item in self.DEFAULT_METADATA.iteritems():
+            for level, item in self.DEFAULT_METADATA.items():
                 if level == 'LABELS':
                     continue
                 self.DEFAULTS[section]\
@@ -271,7 +271,7 @@ class MetadataEditorSetting(object):
             assert editorSection, 'Unable to locate provided editor!'
 
 
-        elif isinstance(editorOrEditorSection, basestring):
+        elif isinstance(editorOrEditorSection, str):
             assert (editorOrEditorSection in self.MetadataEditorSets), \
                 "Invalid editorSection: %s, %s"%(editorOrEditorSection, 
                                              self.MetadataEditorSets)
@@ -312,7 +312,7 @@ class MetadataEditorSetting(object):
         @param editor: The MetadataEditor to find the section of.  
         @type editor: MetadataEditor
         """
-        for section, editorSet in self.MetadataEditorSets.iteritems():
+        for section, editorSet in self.MetadataEditorSets.items():
             if editorSet.hasEditor(editor):
                 return section
         
@@ -388,7 +388,7 @@ class MetadataEditorSetting(object):
         # If no editor, run on all editors.
         #--------------------
         if not editor:
-            for key, editorSet in self.MetadataEditorSets.iteritems():
+            for key, editorSet in self.MetadataEditorSets.items():
                 editorSet.loopEditors(self.__syncToFile)
             return
 

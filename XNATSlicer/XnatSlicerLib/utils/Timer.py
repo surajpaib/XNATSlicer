@@ -107,7 +107,7 @@ class Timer(object):
             
         str  = ("%s <--Start timer %s"%(self.prev, currStr))
         self.timerStrs.append(str + '\n')
-        #print str
+        #print(str)
 
 
         
@@ -134,12 +134,12 @@ class Timer(object):
             
             str1  = ("%s <---Stop timer %s"%(self.curr, currStr))
             self.timerStrs.append(str1 + '\n')
-            print str1
+            print(str1)
 
             if printTimeDiff:
                 str2 =  ("\n\nTOTAL TIME ELAPSED %s: \t\t%s"%(elapseStr, (self.curr-self.prev)))
                 self.timerStrs.append(str2 + '\n')
-                print str2
+                print(str2)
             
             if fileWrite: self.write()
             self.clear()

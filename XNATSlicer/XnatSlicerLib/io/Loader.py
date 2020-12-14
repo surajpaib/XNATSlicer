@@ -106,9 +106,9 @@ class Loader(object):
             try:
                 shutil.rmtree(os.path.normpath(self.extractPath))
                 os.makedirs(self.extractPath)
-            except Exception, e:
+            except Exception as e:
                 # This fails in windows.
-                #print "LOADER", str(e)
+                #print("LOADER "+str(e))
                 pass
 
 
@@ -121,7 +121,7 @@ class Loader(object):
         #--------------------
         # Tracj files
         #--------------------
-        #print "%s Inventorying downloaded files..."%(MokaUtils.debug.lf())  
+        #print("%s Inventorying downloaded files..."%(MokaUtils.debug.lf()))
         self.extractedFiles = []
         for root, dirs, files in os.walk(self.extractPath):
             for relFileName in files:          
@@ -207,7 +207,7 @@ class Loader_Images(Loader):
         
 
         if self.useCached: 
-            print "Using cached set for:", _src
+            print(f"Using cached set for: {_src}")
             self.performUseCacheUpdates()
 
             

@@ -16,7 +16,7 @@ import inspect
 import sys
 import math
 import copy
-import httplib # to test for SSL installation
+import http.client # to test for SSL installation
 from collections import OrderedDict
 
 # Acquire Module path.
@@ -246,7 +246,7 @@ class XnatSlicerWidget:
             tester = eval(evalString)
             tester.runTest()
         
-        except Exception, e:
+        except Exception as e:
             import traceback
             traceback.print_exc()
             qt.QMessageBox.warning(slicer.util.mainWindow(), 
@@ -419,7 +419,7 @@ class XnatSlicerWidget:
         # the login.  We set the animLength of each
         # collapsible to 0 to avoid awkard load animations
         #--------------------------------
-        for key, collapsible in self.collapsibles.iteritems():
+        for key, collapsible in self.collapsibles.items():
             collapsible.suspendAnim(True)
             if key == 'login':
                 for child in collapsible.getContents():
@@ -443,7 +443,7 @@ class XnatSlicerWidget:
         # when opening Slicer, hence we show them only
         # after they have been added to the layout.
         #
-        for key, collapsible in self.collapsibles.iteritems():
+        for key, collapsible in self.collapsibles.items():
             collapsible.show()
         
         
@@ -490,10 +490,10 @@ class XnatSlicerWidget:
       """
       try:      
         import ssl
-        httplib.HTTPSConnection
+        http.client.HTTPSConnection
         return True
         #MokaUtils.debug.lf("XnatSlicer Module: SSL is installed!")
-      except Exception, e:
+      except Exception as e:
             return False
 
 
@@ -632,7 +632,7 @@ class XnatSlicerWidget:
         #--------------------
         # Update mainLayout when animating
         #--------------------
-        for key, collapsible in self.collapsibles.iteritems():
+        for key, collapsible in self.collapsibles.items():
             collapsible.onEvent('animate', self.__onAnimatedCollapsibleAnimate)
             
 
@@ -666,7 +666,7 @@ class XnatSlicerWidget:
         if state == 'loginSuccessful':
           remainderHeight = parentHeight - self.collapsibleHeights['tools'] - \
                             collapsedHeight - self.collapsibleHeights['details']
-          for key, collapsible in self.collapsibles.iteritems():
+          for key, collapsible in self.collapsibles.items():
             if key in self.collapsibleHeights:
               if key != 'login':
                 targetHeights[key] = self.collapsibleHeights[key]
@@ -691,7 +691,7 @@ class XnatSlicerWidget:
         @param heights: The target heights. 
         @type heights: dict 
         """
-        for key, collapsible in self.collapsibles.iteritems():
+        for key, collapsible in self.collapsibles.items():
           if key in heights:
             self.collapsibles[key].setMaxExpandedHeight(heights[key], 
                                                         applyImmediately)
@@ -711,9 +711,8 @@ class XnatSlicerWidget:
     def __printCollapsibleHeights(self, msg = "Collapsible heights:"):
         """
         """
-        for key, collapsible in self.collapsibles.iteritems():
-          print msg, key, "GEOM", collapsible.geometry.height(), "HINT", \
-            collapsible.sizeHint.height()
+        for key, collapsible in self.collapsibles.items():
+          print(f"{msg} {key} GEOM {collapsible.geometry.height()} HINT {collapsible.sizeHint.height()}")
 
 
 
@@ -781,7 +780,7 @@ class XnatSlicerWidget:
         # the animation chain is finished.
         #--------------------
         def clearChain(): 
-          for key, collapsible in self.collapsibles.iteritems():
+          for key, collapsible in self.collapsibles.items():
             collapsible.clearEvents()
             if key == 'viewer' or key == 'details':
               collapsible.toggleButton.setEnabled(False)
@@ -861,7 +860,7 @@ class XnatSlicerWidget:
         # Clear the animation Chain when finished
         #--------------------
         def clearChain(): 
-            for key, collapsible in self.collapsibles.iteritems():
+            for key, collapsible in self.collapsibles.items():
                 collapsible.clearEvents()
             if callback: callback()
 
@@ -924,8 +923,8 @@ class XnatSlicerWidget:
             #
             self.beginXnat()
         else:
-            print MokaUtils.lf("The host '%s' doesn't appear to" + 
-                  " have a valid URL"%(self.LoginMenu.hostDropdown.currentText))
+            print(MokaUtils.lf("The host '%s' doesn't appear to" + 
+                  " have a valid URL"%(self.LoginMenu.hostDropdown.currentText)))
             pass  
 
 
@@ -1025,7 +1024,7 @@ class XnatSlicerWidget:
         #-------------------
         # Add settings widget to the window
         #-------------------
-        for key, Setting in self.Settings.iteritems():
+        for key, Setting in self.Settings.items():
           self.SettingsWindow.addSetting(Setting.title, widget = Setting)
 
 
@@ -1045,7 +1044,7 @@ class XnatSlicerWidget:
         collapsibles =  self.Settings['METADATA'].\
                         MetadataEditorSets['XNAT Metadata'].\
                         collapsibles
-        for level, collapsible in collapsibles.iteritems():
+        for level, collapsible in collapsibles.items():
           if level == xnatLevel:
             collapsible.setChecked(True)
           else:
@@ -1062,7 +1061,7 @@ class XnatSlicerWidget:
       isHostChange = args and self.Settings['HOSTS'].__class__.__name__ in args
 
       #MokaUtils.debug.lf(args[0])
-      for key, Setting in self.Settings.iteritems():
+      for key, Setting in self.Settings.items():
         Setting.syncToFile()
         slicer.app.processEvents()
       #try:
@@ -1075,8 +1074,8 @@ class XnatSlicerWidget:
       if hasattr(self, 'LoginMenu') and isHostChange: 
         self.__syncToHostChanges(args[1], args[2])
 
-      #except Exception, e:
-      #  print (MokaUtils.debug.lf(str(e)))
+      #except Exception as e:
+      #  print(MokaUtils.debug.lf(str(e)))
       #  pass
 
 
@@ -1122,12 +1121,12 @@ class XnatSlicerWidget:
         self.SettingsFile.Events.onEvent('SETTINGS_FILE_RESTORED',
                                          self.__syncSettingsToFile)
 
-        for key, Setting in self.Settings.iteritems():
+        for key, Setting in self.Settings.items():
           Setting.Events.onEvent('SETTINGS_FILE_MODIFIED', \
                                  self.__syncSettingsToFile)
 
           if hasattr(Setting, 'MetadataEditorSets'):
-            for setKey, _set in Setting.MetadataEditorSets.iteritems():
+            for setKey, _set in Setting.MetadataEditorSets.items():
               _set.Events.onEvent('editCustomClicked', self.__showCustomWindow)
           
 
@@ -1137,7 +1136,7 @@ class XnatSlicerWidget:
             # Sort Button event.
             #
             #for key, button \
-            #    in self.__Settings['VIEW'].buttons['sort'].iteritems():
+            #    in self.__Settings['VIEW'].buttons['sort'].items():
               #button.connect('clicked()', self.onFilterButtonClicked)
 
             self.__Settings['VIEW'].Events.onEvent('FILTERTOGGLED',
@@ -1212,7 +1211,7 @@ class XnatSlicerWidget:
       @return: The key of the loggin host or None
       @rtype: str
       """
-      for key, val in self.__loggedIn.iteritems():
+      for key, val in self.__loggedIn.items():
         if val: return key
       return None
       
@@ -1251,8 +1250,8 @@ class XnatSlicerWidget:
       """
       try:
         self.SettingsWindow.showWindow(self.__Settings['HOSTS'].title)
-      except Exception, e:
-        print "Error opening Host Settings: %s"%(str(e))
+      except Exception as e:
+        print("Error opening Host Settings: %s"%(str(e)))
 
 
 
@@ -1261,7 +1260,7 @@ class XnatSlicerWidget:
       """
       if not host:
         host = self.LoginMenu.hostDropdown.currentText
-      for key, Setting in self.__Settings.iteritems():
+      for key, Setting in self.__Settings.items():
         Setting.currXnatHost = host
         #MokaUtils.debug.lf(Setting.__class__.__name__)
         Setting.syncToFile()

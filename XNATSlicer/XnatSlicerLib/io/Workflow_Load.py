@@ -176,7 +176,7 @@ class Workflow_Load(object):
             # Set loader to None if it pertains to the 
             # cancelled download
             #
-            for key, loader in self.loaders.iteritems():
+            for key, loader in self.loaders.items():
                 if loader and _xnatSrc in loader.loadArgs['src']:
                     self.loaders[key] = None
 
@@ -273,7 +273,7 @@ class Workflow_Load(object):
         def onDownloadFinished():
             self.XnatDownloadPopup.hide()
             self.postDownloadPopup.show()
-            for key, loader in self.loaders.iteritems():
+            for key, loader in self.loaders.items():
                 #print "DOWNLOAD FINISHED!"
                 if loader:
                     loader.load()
@@ -386,7 +386,7 @@ class Workflow_Load(object):
             #print "LOADABLES", loadables
             # cycle through the loadables and
             # create the loader for each loadable list.
-            for loadableType, loadableList in loadables.iteritems():
+            for loadableType, loadableList in loadables.items():
                 if len(loadableList) > 0:
                     if loadableType == 'analyze':
                         loaders.append(Loader_Analyze(self.MODULE, _src, loadables[loadableType]))

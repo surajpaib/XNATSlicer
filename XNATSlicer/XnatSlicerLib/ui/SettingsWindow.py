@@ -96,10 +96,10 @@ class SettingsWindow(FingerTabWidget):
         try:
             for i in range(0, len(self.tabButtons)):
                 for key, manager in self.settingsWidgets[i]['widget'].\
-                    MetadataEditorSets.iteritems(): 
+                    MetadataEditorSets.items(): 
                     ##print "\n\tUpdating Manager for: ", key
                     manager.update()
-        except Exception, e:
+        except Exception as e:
             #MokaUtils.debug.lf("MetadataEditorSetObject error.", str(e))
             pass
 

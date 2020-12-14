@@ -155,7 +155,7 @@ class Loader_Mrb(Loader_File):
             #
             # Special case for url encoding
             #
-            filePathsToChange[os.path.basename(urllib2.quote(mrmlBase))] = "./Data/" + urllib2.quote(mrmlBase)
+            filePathsToChange[os.path.basename(urllib.request.quote(mrmlBase))] = "./Data/" + urllib.request.quote(mrmlBase)
 
         newMRMLFile = MokaUtils.path.addSuffixToFileName(mrml, "-LOCALIZED")       
         SlicerUtils.MrmlParser.changeValues(mrml, newMRMLFile,  {},  None, True)
