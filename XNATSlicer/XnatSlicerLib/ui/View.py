@@ -118,8 +118,8 @@ class View(object):
             #
             if projectContents == None:
                 self.showError("Login error", 
-                               "Invalid username and/or password for " + 
-                               "the XNAT host 'HOST_NAME' (HOST_URL).")
+                    "Login failed on XNAT host 'HOST_NAME' (HOST_URL)." + 
+                    "Please check your username and password")
                 return
 
 

@@ -8,14 +8,14 @@ __maintainer__ = "Rick Herrick"
 __email__ = "herrickr@mir.wustl.edu"
 __status__ = "Production"
 
+from __main__ import qt
 
 import os
-import urllib.request
+import sys
 import base64
-import urllib.parse
-import http.client
 import json
-
+import requests
+import threading
 
 
 class Xnat(object):
@@ -78,7 +78,7 @@ class Xnat(object):
         >>> from Xnat import *
         >>> xnat = Xnat.io('http://central.xnat.org', 'testUser', \
             'testUserPassword')
-        >>> contents = xnatIo.getFolder('projects')
+        >>> contents = xnat.getFolder('projects')
         >>> print(contents['111']['ID'])
         'XNATSlicerTest'    
         """
@@ -135,10 +135,17 @@ class Xnat(object):
             #-------------------
             # Make relevant variables for __httpsRequests
             #-------------------
-            #base64string = base64.encodestring(('%s:%s' % (self.username, self.password)).encode())[:-1]
-            base64string = base64.encodestring(f'{self.username}:{self.password}'.encode())
+            base64string = base64.encodebytes(f'{self.username}:{self.password}'.encode())
             self.authHeader = { 'Authorization' : 'Basic %s' %(base64string) }
+            self.auth = (self.username, self.password)
+            self.session = requests.Session()
+            self.session.auth = self.auth
             self.fileDict = {}
+            self.response = None
+
+            # Popups
+            self.exceptionPopup = qt.QMessageBox()
+            self.exceptionPopup.setIcon(4)
 
 
 
@@ -280,7 +287,7 @@ class Xnat(object):
             """ 
             Downloads a file from a given XNAT host.
 
-            @param _src: The source XNAT URL to download form.
+            @param _src: The source XNAT URL to download from.
             @type: string
 
             @param _dst: The local dst to download to.
@@ -294,14 +301,12 @@ class Xnat(object):
             self.downloadTracker['downloadedSize']['bytes'] = 0
             downloadFolders = []
 
-
-
             #-------------------------
             # Remove existing dst files from their local URI
             #-------------------------
             if os.path.exists(_dst):
                 os.remove(_dst)
-            self.__getFile_urllib(_src, _dst)
+            self.__getFile_requests(_src, _dst)
 
 
 
@@ -345,7 +350,6 @@ class Xnat(object):
 
 
 
-
         def getFileSize(self, _uri):
             """ 
             Retrieves a tracked file's size and 
@@ -358,14 +362,25 @@ class Xnat(object):
 
             @return: The size in MB of the file.
             @rtype: integer
-            """
-            bytes = 0
+            """            
+            totalBytes = 0
             fileName = os.path.basename(_uri)
-            if fileName in self.fileDict:
-                bytes = int(self.fileDict[fileName]['Size'])
-                return {"bytes": (bytes), "MB" : Xnat.utils.bytesToMB(bytes)}
-            return {"bytes": None, "MB" : None}
 
+            if fileName in self.fileDict:
+                # Get size from fileDict log if it exists
+                totalBytes = int(self.fileDict[fileName]['Size'])
+            elif '/scans' in _uri:
+                # Add all files for scan if it is a scan uri
+                files = self.__getJson(_uri.replace('zip', 'json'))
+
+                for f in files:
+                    totalBytes += int(f['Size'])
+
+            totalSize = {
+                "bytes": (totalBytes),
+                "MB" : Xnat.utils.bytesToMB(totalBytes)
+            }
+            return totalSize 
 
 
 
@@ -404,21 +419,11 @@ class Xnat(object):
             @type: boolean   
             """
 
-
-            #-------------------- 
-            # Read '_src' data.
-            #-------------------- 
-            f = open(_src, 'rb')
-            filebody = f.read()
-            f.close()
-
-
-
             #-------------------- 
             # Delete existing _dst from XNAT host.
             #-------------------- 
             if delExisting:
-                self.__httpsRequest('DELETE', _dst, '')
+                r = self.__httpsRequest('DELETE', _dst)
             #print("%s Uploading\nsrc: '%s'\n_dst: '%s'"%(_src, _dst))
 
 
@@ -435,8 +440,10 @@ class Xnat(object):
             # Put the file in XNAT using the internal '__httpsRequest'
             # method.
             #-------------------- 
-            response = self.__httpsRequest('PUT', _dst, filebody, 
-                            {'content-type': 'application/octet-stream'})
+            with open(_src, 'rb') as f:
+                response = self.__httpsRequest('PUT', _dst, files={'file': f}, 
+                    headers={'Content-Type': 'application/octet-stream'}, stream=True)
+
             return response
 
 
@@ -524,7 +531,7 @@ class Xnat(object):
             #-------------------- 
             # Looping through all of the levels,
             # constructing a searchQuery for each based
-            # on the releant columns.
+            # on the relevant columns.
             #--------------------       
             levels = ['projects', 'subjects', 'experiments']
             for level in levels:
@@ -601,6 +608,10 @@ class Xnat(object):
             if not event in self.EVENT_TYPES:
                 raise Exception("XnatIo (onEvent): invalid event type '%s'"%(\
                                                                     event))
+            if not hasattr(self, 'eventCallbacks__'):
+                print('self has no attribute eventCallbacks__')
+                return
+
             for callback in self.eventCallbacks__[event]:
                 #print(f"EVENT CALLBACK {event}")
                 callback(*args)
@@ -742,7 +753,7 @@ class Xnat(object):
 
 
 
-        def __httpsRequest(self, method, _uri, body='', headerAdditions={}):
+        def __httpsRequest(self, method, _uri, body='', files=None, headers={}, stream=False):
             """ 
             Makes httpsRequests to an XNAT host.
 
@@ -766,37 +777,37 @@ class Xnat(object):
             # Make the request arguments
             #--------------------
             url = Xnat.path.makeXnatUrl(self.host, _uri)
-            request = urllib.request.Request(url)
-            host = request.host
-            #print(f"XNAT URL: {_uri} {url}")
-            
-            #-------------------- 
-            # For local uris
-            #
-            # A ':' indicates the port...
-            #-------------------- 
-            if ':' in host:
-                connection = http.client.HTTPConnection(host)
-            else:
-                from urllib.parse import urlsplit
-                if urlsplit(url).scheme == "http":
-                    connection = http.client.HTTPConnection(host)
-                else:
-                    connection = http.client.HTTPSConnection(host)
-
-            header = {**self.authHeader, **headerAdditions}
-
-
+            print(f"{method} XNAT URL: {url}")
+            if (body):
+                print(body)
 
             #-------------------- 
             # Conduct REST call
             #-------------------- 
-            print("request.selector: "+str(request.selector))
-            connection.request(method.upper(), request.selector,
-                               body=body, headers=header)
-            return connection.getresponse()
+            # self.__requests_worker(method, url, body, files, headers, stream)
+            t = threading.Thread(
+                target=self.__requests_worker, 
+                args=(method, url, body, files, headers, stream,))
+            t.start()
+            t.join()
+                
+            return self.response
+            
 
-
+        def __requests_worker(self, method, url, body, files, headers, stream):
+            try:
+                if method == 'POST':
+                    self.response = self.session.post(url, headers=headers)
+                elif method == 'GET':
+                    self.response = self.session.get(url, stream=stream)
+                elif method == 'PUT':
+                    self.response = self.session.put(url, files=files, stream=stream)
+                elif method == 'DELETE':
+                    self.response = self.session.delete(url)
+            except Exception as e:
+                print(e)
+                self.exceptionPopup.setText(str(e))
+                self.exceptionPopup.show()
 
 
         def __downloadFailed(self, _src, _dst, dstFile, message):
@@ -880,8 +891,6 @@ class Xnat(object):
 
         def __getFile_urllib(self, _src, _dst):
             """ 
-            This is the preferred method for getting files from XNAT.
-
             This method is in place for the main purpose of downlading
             a given source in packets (buffers) as opposed to one large file.
 
@@ -1006,6 +1015,79 @@ class Xnat(object):
 
 
 
+        def __getFile_requests(self, _src, _dst):
+            """ 
+            Replaces urllib and httplib __getFile methods
+
+            @param _src: The _src url to run the GET request on.
+            @type _src: string
+
+            @param _dst: The destination path of the GET (for getting files).
+            @type _dst: string         
+            """
+
+            #-------------------- 
+            # Get the content size from scan json
+            #-------------------- 
+            self.downloadTracker['downloadedSize']['bytes'] = 0   
+            self.downloadTracker['totalDownloadSize'] = self.getFileSize(_src)
+
+            #-------------------- 
+            # Pre-download callbacks
+            #-------------------- 
+            size = self.downloadTracker['totalDownloadSize']['bytes'] \
+                   if self.downloadTracker['totalDownloadSize']['bytes'] else -1
+            self.runEventCallbacks('downloadStarted', _src, size)
+            self.runEventCallbacks('downloading', _src, 0)
+
+            #-------------------- 
+            # Open the local destination file 
+            # so that it can start reading in the buffers.
+            #-------------------- 
+            try:
+                dstFile = _dst
+                dstDir = os.path.dirname(_dst)        
+                if not os.path.exists(dstDir):
+                    os.makedirs(dstDir)
+                # print("dstFile: {}".format(dstFile))
+            except Exception as e:
+                print(e)
+                self.__downloadFailed(_src, _dst, dstFile, str(e))
+                self.exceptionPopup.setText(str(e))
+                return
+
+            #-------------------- 
+            # Construct the request
+            #-------------------- 
+            url = Xnat.path.makeXnatUrl(self.host, _src)
+            r = self.__httpsRequest('GET', url, stream=True)
+            f = open(dstFile, 'wb')
+
+            for chunk in r.iter_content(chunk_size=1024*1024):
+                # Check for cancel event
+                if not self.inDownloadQueue(_src):
+                    f.close()
+                    os.remove(f.name)
+                    self.runEventCallbacks('downloadCancelled', _src)
+                    break
+
+                f.write(chunk)
+
+                self.downloadTracker['downloadedSize']['bytes'] += len(chunk)
+                self.runEventCallbacks('downloading', _src, 
+                            self.downloadTracker['downloadedSize']['bytes'])
+
+            r.close()
+            f.close()
+
+            #-------------------- 
+            # Post-download callbacks
+            #--------------------     
+            self.removeFromDownloadQueue(_src)
+            self.runEventCallbacks('downloadFinished', _src)
+
+
+
         def __bufferRead(self, _src, dstFile, response, bufferSize=8192):
             """
             Downloads a file by a constant buffer size.
@@ -1097,21 +1179,30 @@ class Xnat(object):
             """
 
             #-------------------- 
+            # Add explicit format=json if not already there
+            #--------------------  
+            if 'format=json' not in _uri:
+                if '?' in _uri:
+                    _uri += '&format=json'
+                else:
+                    _uri += '?format=json'
+
+
+            #-------------------- 
             # Get the response from httpRequest
             #--------------------     
             xnatUrl = Xnat.path.makeXnatUrl(self.host, _uri)
-            response = self.__httpsRequest('GET', xnatUrl).read()
-
-
+            r = self.__httpsRequest('GET', xnatUrl)
 
             #-------------------- 
             # Try to load the response as a JSON...
             #-------------------- 
             try:
-                return json.loads(response)['ResultSet']['Result']
+                return r.json()['ResultSet']['Result']
             except Exception as e:
+                self.exceptionPopup.setText(str(e))
                 self.runEventCallbacks('jsonError', self.host.encode(),
-                                       self.username.encode(), response.decode())
+                                       self.username.encode(), r)
 
 
 
@@ -1284,25 +1375,27 @@ class Xnat(object):
             @param _url: The partial or full XNAT query uri
             @type _url: string
             
-            @return: The full XNAT url for to run the query on.
+            @return: The full XNAT url to run the query on.
             @rtype: string
             """
-            
+
+            if isinstance(_url, bytes):
+                _url = _url.decode(sys.getdefaultencoding())
         
             if _url.startswith('/'):
                 _url = _url[1:]
 
             if not _url.startswith(host):
                 if _url.startswith('data/'):
-                    _url = urllib.parse.urljoin(host, _url)
+                    _url = requests.compat.urljoin(host, _url)
                 else:
-                    prefixUri = urllib.parse.urljoin(host, 'data/archive/')
-                    _url = urllib.parse.urljoin(prefixUri, _url) 
+                    prefixUri = requests.compat.urljoin(host, 'data/archive/')
+                    _url = requests.compat.urljoin(prefixUri, _url)
 
 
             #--------------------
             # Remove double slashes
-            #--------------------                    
+            #--------------------
             _url = _url.replace('//', '/')
             if 'http:/' in _url:
                 _url = _url.replace('http:/', 'http://')

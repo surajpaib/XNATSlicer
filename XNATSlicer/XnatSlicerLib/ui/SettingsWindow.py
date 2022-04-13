@@ -49,7 +49,7 @@ class SettingsWindow(FingerTabWidget):
         self.hide()
         #self.masterLayout.addWidget(self.closeButton, 1, 1)
         self.settingsWidgets = []
-        self.connect('currentChanged(int)', self.updateSettingWidgets)
+        # self.connect('currentChanged()', self.updateSettingWidgets)
         self.addCancelAndDoneButton()
 
     

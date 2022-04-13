@@ -223,7 +223,8 @@ class SlicerUtils(object):
             mrmlText = mrmlFile.read()
             elementTree = ET.ElementTree(ET.fromstring(mrmlText))
             root = elementTree.getroot()
-            iterator = root.getiterator()
+            # iterator = root.getiterator()
+            iterator = list(root.iter())
 
 
 

@@ -425,9 +425,10 @@ class MokaUtils(object):
                     except Exception as e:
                         #print(str(e))
                         pass
-                    target = file(os.path.join(toDir, filename), "wb")
-                    with source, target:
-                        shutil.copyfileobj(source, target)
+
+                    dstFile = os.path.join(toDir, filename)
+                    with open(dstFile, 'wb') as f:
+                        shutil.copyfileobj(source, f)
 
 
 
@@ -776,7 +777,7 @@ class MokaUtils(object):
             @return: The bytes converted to MB.
             @rtype: float
             """
-            assert isinstance(decimalPlaces, (int, long)), "%s " + \
+            assert isinstance(decimalPlaces, int), "%s " + \
             "is an invalid decimal place."%(decimalPlaces)
 
             _bytes = int(_bytes)

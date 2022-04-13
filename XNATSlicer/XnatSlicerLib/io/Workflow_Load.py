@@ -75,7 +75,10 @@ class Workflow_Load(object):
         self.clearScenePopup = XnatClearScenePopup()
         self.clearScenePopup.connect('buttonClicked(QAbstractButton*)', self.__clearSceneButtonClicked) 
 
-        self.preDownloadPopup = XnatTextPopup('<b>Checking files...</b>')
+        # self.preDownloadPopup = XnatTextPopup('<b>Checking files...</b>')
+        self.preDownloadPopup = qt.QMessageBox()
+        self.areYouSureDialog.setIcon(4)
+        self.preDownloadPopup.setText("Checking files...")
         self.postDownloadPopup = XnatTextPopup('<b>Processing.  Data will load automatically.</b>')
 
 
@@ -217,6 +220,7 @@ class Workflow_Load(object):
             self.MODULE.View.sessionManager.clearCurrentSession()
             slicer.app.mrmlScene().Clear(0)
         
+        self.clearScenePopup.hide()
         self.skipEmptySceneCheck = True
         self.beginWorkflow()
             
@@ -379,6 +383,11 @@ class Workflow_Load(object):
             scanSrc = splitScan[0] + '/scans/' + splitScan[1].split('/')[0] + '/files'
             #print "SPLIT SCAN:", splitScan, '\n\t',scanSrc
             # query xnat for folder contents
+            scan_uri = self.MODULE.XnatIo.getFolder(scanSrc, metadata= ['URI'])
+            if not scan_uri:
+                print('Scan has no files')
+                self.preDownloadPopup.setText('No files found. Verify scan resources on XNAT.')
+                return []
             contentUris = self.MODULE.XnatIo.getFolder(scanSrc, metadata= ['URI'])['URI']
             #print "CONTENT URIS", contentUris
             # get file uris and sort them by type

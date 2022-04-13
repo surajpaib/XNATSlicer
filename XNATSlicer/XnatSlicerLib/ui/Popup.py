@@ -66,7 +66,7 @@ class XnatClearScenePopup(qt.QMessageBox):
         
         self.setStandardButtons(qt.QMessageBox.Yes | qt.QMessageBox.No)
         #self.setTitle(title)
-        #self.setWindowModality(modality)
+        self.setWindowModality(modality)
         self.setDefaultButton(qt.QMessageBox.No)
         self.setText("Clear the current scene?")
 
