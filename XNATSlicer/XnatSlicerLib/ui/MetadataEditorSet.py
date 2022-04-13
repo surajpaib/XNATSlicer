@@ -106,7 +106,7 @@ class MetadataEditorSet(qt.QFrame):
         # Set the default states of the 
         # collapsibles.
         #--------------------       
-        for key, collapsible in self.collapsibles.iteritems():
+        for key, collapsible in self.collapsibles.items():
             collapsible.suspendAnim(True)
             collapsible.show()
             collapsible.setChecked(True)
@@ -119,8 +119,8 @@ class MetadataEditorSet(qt.QFrame):
     def allEditors(self):
         """
         """
-        return [e for l, e in self.defaultMetadataEditors.iteritems()] + \
-        [e for l, e in self.customMetadataEditors.iteritems()] 
+        return [e for l, e in self.defaultMetadataEditors.items()] + \
+        [e for l, e in self.customMetadataEditors.items()] 
             
         
 
@@ -255,7 +255,7 @@ class MetadataEditorSet(qt.QFrame):
         # Set callback to Update XNATSlicer's 
         # layout when animating.
         #--------------------
-        for key, collapsible in self.collapsibles.iteritems():
+        for key, collapsible in self.collapsibles.items():
             collapsible.onEvent('animate', self.updateLayout)
 
 
@@ -293,9 +293,9 @@ class MetadataEditorSet(qt.QFrame):
         """
         ##print "\t (Metadata Manager) METADATA SET ITEM TYPE", itemType
         self.currItemType = itemType
-        for key, metadataEditor in self.defaultMetadataEditors.iteritems():
+        for key, metadataEditor in self.defaultMetadataEditors.items():
             metadataEditor.setItemType(itemType)
-        for key, metadataEditor in self.customMetadataEditors.iteritems():
+        for key, metadataEditor in self.customMetadataEditors.items():
             metadataEditor.setItemType(itemType)
 
 
@@ -310,7 +310,7 @@ class MetadataEditorSet(qt.QFrame):
         if visible != None:
             self.editButtonsVisible = visible
 
-        for key, button in self.editCustomButtons.iteritems():
+        for key, button in self.editCustomButtons.items():
             if button:
                 button.setVisible(self.editButtonsVisible)
 
@@ -322,7 +322,7 @@ class MetadataEditorSet(qt.QFrame):
         Callback when any of the 'editCustomButtons'
         are clicked.  Descriptors below.
         """
-        for xnatLevel, _button in self.editCustomButtons.iteritems():
+        for xnatLevel, _button in self.editCustomButtons.items():
             if button == _button:
                 self.Events.runEventCallbacks('editCustomClicked', 
                                               button, xnatLevel)
@@ -335,7 +335,7 @@ class MetadataEditorSet(qt.QFrame):
         Sets the 'editLine' of every MetadataEditor 
         visible.
         """
-        for key, metadataEditor in self.customMetadataEditors.iteritems():
+        for key, metadataEditor in self.customMetadataEditors.items():
             metadataEditor.setEditLineVisible(visible)
 
 
@@ -384,7 +384,7 @@ class MetadataEditorSet(qt.QFrame):
                 self.SettingsFile.setSetting(self.currXnatHost, tagDict)
 
 
-            except Exception, e:
+            except Exception as e:
                 MokaUtils.debug.lf(str(e))
 
 

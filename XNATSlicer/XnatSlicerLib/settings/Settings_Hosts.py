@@ -49,9 +49,10 @@ class Settings_Hosts(Settings):
             'username': ''
         }
     }
-    DEFAULT_HOSTS = dict(DEFAULT_HOSTS.items() + PERMANENT_HOSTS.items())
 
-    
+    # Add PERMANENT_HOSTS to default
+    DEFAULT_HOSTS.update(PERMANENT_HOSTS)
+
 
     def setup(self):
         """
@@ -233,12 +234,12 @@ class Settings_Hosts(Settings):
         """
         if not self.__validateHostName():
             if hasattr(self, 'saveButtons'):
-                for key, button in self.saveButtons.iteritems():
+                for key, button in self.saveButtons.items():
                     button.setEnabled(False)
             return
 
         if hasattr(self, 'saveButtons'):
-            for key, button in self.saveButtons.iteritems():
+            for key, button in self.saveButtons.items():
                 button.setEnabled(True)
 
 
@@ -345,7 +346,7 @@ class Settings_Hosts(Settings):
         @return: Whether the host name exists.
         @rtype: bool
         """
-        for rowDict, item in self.hostTable.trackedItems.iteritems():
+        for rowDict, item in self.hostTable.trackedItems.items():
             if item['name'].text() == hostName:
                 return True
         return False
@@ -423,7 +424,7 @@ class Settings_Hosts(Settings):
         self.currModal = makeEditHostModal(self)
         self.currModal.setWindowModality(1)
         self.currModal.show()  
-        for key, line in self.errorLines.iteritems():
+        for key, line in self.errorLines.items():
             line.setText('')
         
         
@@ -594,11 +595,11 @@ class HostTable(qt.QTableWidget):
         try:
             if self.trackedItems[rowNumber]:
                 returner = {}
-                for key, item in self.trackedItems[rowNumber].iteritems():
+                for key, item in self.trackedItems[rowNumber].items():
                     returner[key] = item.text()
                 
                 return returner
-        except Exception, e:
+        except Exception as e:
             #MokaUtils.debug.lf("Skipping (Ref: '%s')"%(str(e)))
             pass
 
@@ -727,7 +728,7 @@ class HostTable(qt.QTableWidget):
         #--------------------
         # Set the added items' aeshetics.
         #--------------------
-        for key, item in self.trackedItems[self.rowCount-1].iteritems():
+        for key, item in self.trackedItems[self.rowCount-1].items():
             item.setFont(Settings_Hosts.FONT)
 
 

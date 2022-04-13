@@ -98,7 +98,7 @@ class XnatSessionArgs(dict):
         """
         if prefStr: 
             MokaUtils.debug.lf(('%s')%(prefStr))
-        for k,v in self.iteritems():
+        for k,v in self.items():
             MokaUtils.debug.lf( "[\'%s\']=\t%s"%(k,v))
 
 

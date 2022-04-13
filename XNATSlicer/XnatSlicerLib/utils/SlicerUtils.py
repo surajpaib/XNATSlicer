@@ -75,7 +75,7 @@ class SlicerUtils(object):
         # Cycle through nodes to get the visible ones.
         #------------------------
         for i in range(0, origScene.GetNumberOfNodes()):
-            mrmlNode = origScene.GetNthNode(i);
+            mrmlNode = origScene.GetNthNode(i)
             if mrmlNode:
                 try:
                     #
@@ -84,7 +84,7 @@ class SlicerUtils(object):
                     if (str(mrmlNode.GetVisibility()) == "1" ):
                         ##print "The %sth node of the scene is visible: %s"%(str(i), mrmlNode.GetClassName())
                         visibleNodes.append(mrmlNode)
-                except Exception, e:
+                except Exception as e:
                     pass
 
                 
@@ -138,7 +138,7 @@ class SlicerUtils(object):
                 # See if node has a filename.
                 #
                 nodeFN = node.GetFileName()
-            except Exception, e:
+            except Exception as e:
                 pass 
                 #
                 # If there is a filename, get its extension.              
@@ -223,7 +223,8 @@ class SlicerUtils(object):
             mrmlText = mrmlFile.read()
             elementTree = ET.ElementTree(ET.fromstring(mrmlText))
             root = elementTree.getroot()
-            iterator = root.getiterator()
+            # iterator = root.getiterator()
+            iterator = list(root.iter())
 
 
 

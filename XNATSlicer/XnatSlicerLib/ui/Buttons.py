@@ -133,7 +133,7 @@ class Buttons(object):
         #--------------------
         # Convert 'keys' to list if it isn't one.
         #--------------------
-        if isinstance(keys, basestring):
+        if isinstance(keys, str):
             keys = [keys]
 
 
@@ -141,7 +141,7 @@ class Buttons(object):
         #--------------------
         # Loop through buttons, add to array
         #--------------------
-        for groupName, buttonGroup in self.buttons.iteritems():
+        for groupName, buttonGroup in self.buttons.items():
             for buttonId in buttonGroup:
                 for key in keys:
                     if buttonId.lower() == key.lower():
@@ -169,7 +169,7 @@ class Buttons(object):
         # Otherwise apply 'setEnabled' to all buttons.
         #--------------------
         else:
-            for k,b in self.buttons.iteritems():
+            for k,b in self.buttons.items():
                 b.setEnabled(enabled)
 
 

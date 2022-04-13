@@ -55,7 +55,7 @@ class CheckBoxSetting(object):
         assert hasattr(self, 'CHECKBOXES'), \
                 "%s needs a CHECKBOXES variable"%(self.__class__.__name__)
 
-        for key, val in self.CHECKBOXES.iteritems():
+        for key, val in self.CHECKBOXES.items():
             storeTag = self.getCheckBoxStorageTag(key)
             self.EVENT_TYPES.append(self.CHECKBOXES[key]['event'])
             self.CHECKBOXES[key]['widget'] = qt.QCheckBox(val['desc'])
@@ -81,7 +81,7 @@ class CheckBoxSetting(object):
         Method specific to syncing the Setting's checkboxes to the SettingsFile.
         """
         #MokaUtils.debug.lf()
-        for key, val in self.CHECKBOXES.iteritems():
+        for key, val in self.CHECKBOXES.items():
             storeTag = self.getCheckBoxStorageTag(key)
             setting = self.SettingsFile.getSetting(self.currXnatHost, storeTag)
             checked = 2 if 'True' in setting[0] else 0
@@ -90,7 +90,7 @@ class CheckBoxSetting(object):
             try:
                 self.Events.runEventCallbacks(self.CHECKBOXES[key]['event'], 
                                               checked)
-            except Exception, e:
+            except Exception as e:
                 #MokaUtils.debug.lf(str(e))
                 pass
         self.updateUI()
@@ -105,7 +105,7 @@ class CheckBoxSetting(object):
         @param checked: The checked state of the CheckBox.
         @type checked: str
         """
-        for key, val in self.CHECKBOXES.iteritems():
+        for key, val in self.CHECKBOXES.items():
             storeTag = self.getCheckBoxStorageTag(key)
             self.SettingsFile.setSetting(self.currXnatHost, 
                     {storeTag: str(self.CHECKBOXES[key]['widget'].isChecked())})

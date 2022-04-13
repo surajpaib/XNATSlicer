@@ -58,7 +58,7 @@ class XnatSlicerUtils(object):
         Makes any of the needed modules paths on the
         local system.
         """
-        for key, val in XnatSlicerGlobals.LOCAL_URIS.iteritems():
+        for key, val in XnatSlicerGlobals.LOCAL_URIS.items():
             if not os.path.exists(val):    
                 os.makedirs(val)
 
@@ -410,8 +410,8 @@ class XnatSlicerUtils(object):
             #day_string = d.strftime('%Y-%m-%d')
             day_string = d.strftime('%A %d, %B %Y')
             day_string = d.strftime('%c')
-        except Exception, e:
-            #print "Using default date string from server"#. (Error: %s)" %(e)
+        except Exception as e:
+            #print("Using default date string from server"#. (Error: %s)" %(e))
             day_string = dateString
         
         return day_string

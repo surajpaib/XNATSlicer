@@ -75,7 +75,7 @@ class Loader_Dicom(Loader_Images):
         # and the database files 
         #--------------------
         self.cachedFiles = []
-        for key, value in fullToAbbrev.iteritems():
+        for key, value in fullToAbbrev.items():
             for abbrevUri in abbrevUris:
                 if abbrevUri in key:
                     self.cachedFiles.append(value)
@@ -144,7 +144,7 @@ class Loader_Dicom(Loader_Images):
         try:
             dicomIndexer.addListOfFiles(slicer.dicomDatabase, \
                                         self.extractedFiles)
-        except Exception, e:
+        except Exception as e:
             
             #
             # If the database is uninitialized, then initialize it.

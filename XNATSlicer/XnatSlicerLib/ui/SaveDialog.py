@@ -132,7 +132,7 @@ class SaveDialog(object):
                 # Set dialog based on the 'dialogType' argument.
                 #
                 self.dialogs.append(dialogType[str(x)])      
-            except Exception, e:
+            except Exception as e:
                 #
                 # Set default based on the default 'dialogType' argument.
                 #
@@ -340,7 +340,7 @@ class XnatFileSaveDialog(SaveDialog):
 
 
 
-        ##print "%s"%(MokaUtils.debug.lf())
+        ##print("%s"%(MokaUtils.debug.lf()))
 
 
 

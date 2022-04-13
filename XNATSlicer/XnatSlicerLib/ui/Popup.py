@@ -66,7 +66,7 @@ class XnatClearScenePopup(qt.QMessageBox):
         
         self.setStandardButtons(qt.QMessageBox.Yes | qt.QMessageBox.No)
         #self.setTitle(title)
-        #self.setWindowModality(modality)
+        self.setWindowModality(modality)
         self.setDefaultButton(qt.QMessageBox.No)
         self.setText("Clear the current scene?")
 
@@ -290,7 +290,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
             #print "Cancelling download '%s'"%(dlStr)
             textEdit.setText(textEdit.toHtml().replace('DOWNLOADING', 
                                                        'CANCELLED'))
-            for key, item in self.downloadRows.iteritems():
+            for key, item in self.downloadRows.items():
                 if item['progressBar'] == progressBar:
                     item['progressBar'].setEnabled(False)
                     item['progressBar'].setMaximum(100)
@@ -332,7 +332,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         # add them to the innerWidgetLayout.
         #-------------------
         sortedRows = [None] * len(self.downloadRows)
-        for key, item in self.downloadRows.iteritems():
+        for key, item in self.downloadRows.items():
             #print len(sortedRows), item['queuePosition']
             sortedRows[item['queuePosition']] = key
         for key in sortedRows:
@@ -417,7 +417,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
     def makeDownloadPath(self, pathDict):
         """
         """
-        if isinstance(pathDict, basestring):
+        if isinstance(pathDict, str):
             pathDict = self.downloadRows[pathDict]['pathDict']
         dlStr = ''
         for level in Xnat.path.DEFAULT_LEVELS:

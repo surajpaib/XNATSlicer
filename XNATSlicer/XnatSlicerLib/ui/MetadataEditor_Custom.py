@@ -165,7 +165,7 @@ class MetadataEditor_Custom(MetadataEditor):
             self.addButton.hide()
             self.deleteButton.hide()
             self.mainLayout.update()
-        except Exception, e:
+        except Exception as e:
             pass
             
         if visible:

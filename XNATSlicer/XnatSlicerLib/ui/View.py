@@ -106,7 +106,9 @@ class View(object):
             #
             # Error: SERVER ISSUES
             #
-            except Exception, e:
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
                 self.showError("Server error", "Server error for " + 
                                "'HOST_NAME' (HOST_URL):\n%s" %(str(e)))
                 return
@@ -116,8 +118,8 @@ class View(object):
             #
             if projectContents == None:
                 self.showError("Login error", 
-                               "Invalid username and/or password for " + 
-                               "the XNAT host 'HOST_NAME' (HOST_URL).")
+                    "Login failed on XNAT host 'HOST_NAME' (HOST_URL)." + 
+                    "Please check your username and password")
                 return
 
 

@@ -153,7 +153,7 @@ class View_Tree(View, qt.QTreeWidget):
         """
         """
         self.currentFontSize = size
-        for key, font in self.itemFonts.iteritems():
+        for key, font in self.itemFonts.items():
             font.setPointSize(self.currentFontSize)
         self.refreshColumns()
 
@@ -169,7 +169,7 @@ class View_Tree(View, qt.QTreeWidget):
         XNAT metadata values.
         """
         self.columns = {}
-        for key, level in Xnat.metadata.DEFAULT_TAGS.iteritems():
+        for key, level in Xnat.metadata.DEFAULT_TAGS.items():
             for metadata in level:
                 if not metadata in self.columns:
                     self.columns[metadata] = {}
@@ -229,8 +229,7 @@ class View_Tree(View, qt.QTreeWidget):
         # Merge 'self.columnKeyOrder' with
         # the XnatIo.DEFAULT_METADATA
         #---------------------- 
-        self.columnKeyOrder = dict(self.columnKeyOrder.items() + 
-                                   Xnat.metadata.DEFAULT_TAGS.items())
+        self.columnKeyOrder = {**self.columnKeyOrder, **Xnat.metadata.DEFAULT_TAGS}
         
 
 
@@ -270,7 +269,7 @@ class View_Tree(View, qt.QTreeWidget):
                 # Set the headerLabels.
                 #
                 headerLabels.append( self.columns[header]['displayname'])
-            except Exception, e:
+            except Exception as e:
                 ##print e, "column init stuff"
                 continue
         self.setHeaderLabels(headerLabels)
@@ -292,7 +291,7 @@ class View_Tree(View, qt.QTreeWidget):
             self.sortItems(index, self.columnSorts[index])
             
         header = self.header()
-        header.setClickable(True)
+        header.setSectionsClickable(True)
         header.connect('sectionClicked(int)', onHeaderClicked)
                 
 
@@ -427,7 +426,7 @@ class View_Tree(View, qt.QTreeWidget):
                 ##print "KEY: ", self.columns[key]
                 value = widgetItem.text(self.columns[key]['location'])
                 ##print "VALUE: ", value
-            except Exception, e:
+            except Exception as e:
                 value = '(Empty)'
                 xnatLevel = self.columns['XNAT_LEVEL']['value']
                 key2 = str(e)
@@ -547,7 +546,7 @@ class View_Tree(View, qt.QTreeWidget):
         """
         try:
             self.currentItem().parent().removeChild(self.currentItem())
-        except Exception, e:
+        except Exception as e:
             #print "Deleting top level (%s"%(str(e))
             self.removeItemWidget(self.currentItem(), 0)
             
@@ -1144,7 +1143,7 @@ class View_Tree(View, qt.QTreeWidget):
                                                       ['location'])):
                     #print "found dicom"
                     dicomCount +=1
-            except Exception, e:
+            except Exception as e:
                 #print str(e)
                 pass        
         if dicomCount == item.childCount():
@@ -1580,7 +1579,7 @@ class View_Tree(View, qt.QTreeWidget):
         #----------------
         # Convert string children to arrays
         #----------------       
-        if isinstance(children, basestring):
+        if isinstance(children, str):
             children = [children]
 
 

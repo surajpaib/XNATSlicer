@@ -69,7 +69,7 @@ class ScenePackager(object):
         #-------------------
         saveDirectory = os.path.join(XnatSlicerGlobals.LOCAL_URIS['uploads'], \
                                      packageName)
-        ##print MokaUtils.debug.lf() +  "CREATE PACKAGE DIRECTORY: %s"%(saveDirectory)
+        ##print(MokaUtils.debug.lf() +  "CREATE PACKAGE DIRECTORY: %s"%(saveDirectory))
 
 
 
@@ -78,10 +78,10 @@ class ScenePackager(object):
         # with the same name if it exists
         #-------------------
         try:
-            ##print MokaUtils.debug.lf() + ("%s does not exist. Making it."%(saveDirectory)) 
+            ##print(MokaUtils.debug.lf() + ("%s does not exist. Making it."%(saveDirectory)))
             if os.path.exists(saveDirectory): 
                 shutil.rmtree(saveDirectory)
-        except Exception, e: 
+        except Exception as e: 
             pass
 
 
@@ -91,7 +91,7 @@ class ScenePackager(object):
         #-------------------        
         try: 
             os.mkdir(saveDirectory)
-        except Exception, e: 
+        except Exception as e: 
             pass
 
 
@@ -101,7 +101,7 @@ class ScenePackager(object):
         #-------------------
         try: 
             os.makedirs(saveDirectory + "/Data")
-        except Exception, e: 
+        except Exception as e: 
             MokaUtils.debug.lf( "Likely the dir already exists: " + str(e))
 
 

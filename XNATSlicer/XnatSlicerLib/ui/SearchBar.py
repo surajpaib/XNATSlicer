@@ -229,7 +229,7 @@ class SearchBar(qt.QFrame):
             self.MODULE.View.filter_all()
             self.MODULE.View.defaultFilterFunction()
             self.MODULE.View.refreshColumns()
-        except Exception, e:
+        except Exception as e:
             ##print MokaUtils.debug.lf(), str(e)
             pass
 
