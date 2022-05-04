@@ -36,7 +36,8 @@ class XnatSlicerGlobals(object):
     
     DICOM_EXTENSIONS =  [".dcm", ".ima", ".dicom"]
     ANALYZE_EXTENSIONS =  [".hdr", ".img"]
-    MISC_LOADABLE_EXTENSIONS =   [".nii", 
+    MISC_LOADABLE_EXTENSIONS =   [
+                # ".nii", 
                  ".nrrd", 
                  ".img", 
                  ".nhdr", 
