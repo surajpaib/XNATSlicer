@@ -9,6 +9,9 @@ __email__ = "herrickr@mir.wustl.edu"
 __status__ = "Production"
 
 
+## Updated to include ability to load DICOM SEG and RTSTRUCT files by
+## Suraj Pai (b.pai@maastrichtuniversity.nl)
+
 # python
 import os
 
@@ -211,19 +214,29 @@ class Loader_Dicom(Loader_Images):
                        if os.path.basename(sFile) in dlDicomObj: 
                            matchedDatabaseFiles.append(sFile)
 
-
                            
         #--------------------
         # Acquire loadabes as determined by
         # the 'DICOMScalarVolumePlugin' class, by feeding in 
         # 'matchedDatabaseFiles' as a nested array.
         #--------------------
-        dicomScalarVolumePlugin = \
-                        slicer.modules.dicomPlugins['DICOMScalarVolumePlugin']()
-        loadables = dicomScalarVolumePlugin.examine([matchedDatabaseFiles])
+        LoadPlugin = slicer.modules.dicomPlugins['DICOMScalarVolumePlugin']()
+        loadables = LoadPlugin.examine([matchedDatabaseFiles])
 
+        # No loadables found with DICOMScalarVolumePlugin, check for DICOM SEG 
+        if len(loadables) == 0:
+            LoadPlugin = slicer.modules.dicomPlugins['DICOMSegmentationPlugin']()
+            loadables = LoadPlugin.examineFiles(matchedDatabaseFiles)
 
-        
+        # No loadables found with DICOM SEG , check for RT STRUCT objects
+        if len(loadables) == 0:
+            LoadPlugin = slicer.modules.dicomPlugins['DicomRtImportExportPlugin']()
+            loadables = LoadPlugin.examineForImport([matchedDatabaseFiles])
+
+        if len(loadables) == 0:
+            print("No loadables were found.")
+            return False
+
         #--------------------
         # Determine loadable with the highest file count. 
         # This is usually all DICOM files collated as one volume.
@@ -235,17 +248,13 @@ class Loader_Dicom(Loader_Images):
                 highestFileCount = len(loadables[i].files)
                 highestFileCountIndex = i
 
-
-                
         #--------------------
         # Load loadable with the highest file count.
         # This is assumed to be the volume file that contains
         # the majority of the downloaded DICOMS.
         #--------------------
-        dicomScalarVolumePlugin.load(loadables[highestFileCountIndex])
+        LoadPlugin.load(loadables[highestFileCountIndex])
                     
-
-
         
         #--------------------
         # Return true if login successful.
